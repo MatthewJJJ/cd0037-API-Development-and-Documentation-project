@@ -48,57 +48,209 @@ flask run --reload
 
 The `--reload` flag will detect file changes and restart the server automatically.
 
-## To Do Tasks
+### API Reference
 
-These are the files you'd want to edit in the backend:
+`Base URL for now is http://127.0.0.1:5000/`
 
-1. `backend/flaskr/__init__.py`
-2. `backend/test_flaskr.py`
+## Get Categories
 
-One note before you delve into your tasks: for each endpoint, you are expected to define the endpoint and response data. The frontend will be a plentiful resource because it is set up to expect certain endpoints and response data formats already. You should feel free to specify endpoints in your own way; if you do so, make sure to update the frontend or you will get some unexpected behavior.
-
-1. Use Flask-CORS to enable cross-domain requests and set response headers.
-2. Create an endpoint to handle `GET` requests for questions, including pagination (every 10 questions). This endpoint should return a list of questions, number of total questions, current category, categories.
-3. Create an endpoint to handle `GET` requests for all available categories.
-4. Create an endpoint to `DELETE` a question using a question `ID`.
-5. Create an endpoint to `POST` a new question, which will require the question and answer text, category, and difficulty score.
-6. Create a `POST` endpoint to get questions based on category.
-7. Create a `POST` endpoint to get questions based on a search term. It should return any questions for whom the search term is a substring of the question.
-8. Create a `POST` endpoint to get questions to play the quiz. This endpoint should take a category and previous question parameters and return a random questions within the given category, if provided, and that is not one of the previous questions.
-9. Create error handlers for all expected errors including 400, 404, 422, and 500.
-
-## Documenting your Endpoints
-
-You will need to provide detailed documentation of your API endpoints including the URL, request parameters, and the response body. Use the example below as a reference.
-
-### Documentation Example
-
-`GET '/api/v1.0/categories'`
+`GET '/categories'`
 
 - Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
 - Request Arguments: None
-- Returns: An object with a single key, `categories`, that contains an object of `id: category_string` key: value pairs.
+- Returns: An object with a key, `categories`, that contains an object of `id: category_string` key: value pairs, and a key of status which will have a value of success (if the request was successful).
+
+# Request Response:
 
 ```json
 {
-  "1": "Science",
-  "2": "Art",
-  "3": "Geography",
-  "4": "History",
-  "5": "Entertainment",
-  "6": "Sports"
+  "categories": {
+    "1": "Science",
+    "2": "Art",
+    "3": "Geography",
+    "4": "History",
+    "5": "Entertainment",
+    "6": "Sports"
+  },
+  "status": "success"
 }
 ```
 
-## Testing
+## Get Questions
 
-Write at least one test for the success and at least one error behavior of each endpoint using the unittest library.
+`GET '/questions?page=${integer}'`
 
-To deploy the tests, run
+- Fetches a set of questions, a total number of questions, all categories, and current category string.
+- Request Arguments: page -> integer
+- Returns: An object with 10 paginated questions, total questions, object including all categories, current category string, and key of status which will have a value of success (if request was successful)
 
-```bash
-dropdb trivia_test
-createdb trivia_test
-psql trivia_test < trivia.psql
-python test_flaskr.py
+# Request Response:
+
+```json
+{
+  "questions": [
+    {
+      "id": 1,
+      "question": "This is a question",
+      "answer": "This is an answer",
+      "difficulty": 5,
+      "category": 2
+    }
+  ],
+  "totalQuestions": 100,
+  "categories": {
+    "1": "Science",
+    "2": "Art",
+    "3": "Geography",
+    "4": "History",
+    "5": "Entertainment",
+    "6": "Sports"
+  },
+  "currentCategory": "History",
+  "status": "success"
+}
+```
+
+## Get Set of Questions for Category
+
+`GET '/categories/${id}/questions'`
+
+- Fetches questions for a category specified by id request argument
+- Request Arguments: id - integer
+- Returns: An object with questions for the specified category, total questions, current category string, and key of status which will have a value of success (if the request was successful).
+
+# Request Response:
+
+```json
+{
+  "questions": [
+    {
+      "id": 1,
+      "question": "This is a question",
+      "answer": "This is an answer",
+      "difficulty": 5,
+      "category": 4
+    }
+  ],
+  "totalQuestions": 100,
+  "currentCategory": "History",
+  "status": "success"
+}
+```
+
+## Delete Question
+
+`DELETE '/questions/${id}'`
+
+- Deletes a specified question using the id of the question
+- Request Arguments: id - integer
+- Returns: the removed question data in the removed_question key and a status key which will be success if the request is successful.
+
+# Request Response:
+
+```json
+{
+  "removed_question": {
+    "answer": "Tom Cruise",
+    "category": 5,
+    "difficulty": 4,
+    "id": 4,
+    "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
+  },
+  "status": "success"
+}
+```
+
+## Run Quiz
+
+`POST '/quizzes'`
+
+- Sends a post request in order to get the next question
+
+# Request Body:
+
+```json
+{
+  "previous_questions": [1, 4, 20, 15],
+  "quiz_category": "current category"
+}
+```
+
+# Request Response:
+
+```json
+{
+  "question": {
+    "id": 1,
+    "question": "This is a question",
+    "answer": "This is an answer",
+    "difficulty": 5,
+    "category": 4
+  },
+  "status": "success"
+}
+```
+
+## Add Question
+
+`POST '/questions'`
+
+- Sends a post request in order to add a new question
+
+# Request Body:
+
+```json
+{
+  "question": "some question",
+  "answer": "some answer",
+  "difficulty": "3",
+  "category": 1
+}
+```
+
+# Response Body:
+
+```json
+{
+  "new_question": {
+    "answer": "some answer",
+    "category": 1,
+    "difficulty": 3,
+    "id": 27,
+    "question": "some question"
+  },
+  "status": "success"
+}
+```
+
+## Search Questions
+
+`POST '/questions'`
+
+- Sends a post request in order to search for a specific question by search term
+
+# Request Body:
+
+```json
+{
+  "searchTerm": "9"
+}
+```
+
+# Response Body:
+
+```json
+{
+  "questions": [
+    {
+      "id": 1,
+      "question": "This is a question",
+      "answer": "This is an answer",
+      "difficulty": 5,
+      "category": 5
+    }
+  ],
+  "totalQuestions": 100,
+  "currentCategory": "Entertainment"
+}
 ```
