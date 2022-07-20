@@ -12,21 +12,30 @@ def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
     setup_db(app)
+    CORS(app)
 
-    """
-    @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
-    """
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        response.headers.add('Access-Control-Allow-Headers', 'GET, POST, PATCH, DELETE, OPTIONS')
+        return response
 
-    """
-    @TODO: Use the after_request decorator to set Access-Control-Allow
-    """
+    @app.route('/')
+    def get_greeting():
+        return "Hello from the Udacity quiz question API!"
 
-    """
-    @TODO:
-    Create an endpoint to handle GET requests
-    for all available categories.
-    """
-
+    @app.route('/categories')
+    def get_categories():
+        results = Category.query.all()
+        response_dict = {}
+        for element in results:
+            new_element = { element.id: element.type }
+            response_dict.update(new_element)
+    
+        return jsonify({
+            'categories': response_dict,
+            'status': 'success'
+        })
 
     """
     @TODO:
@@ -40,6 +49,22 @@ def create_app(test_config=None):
     ten questions per page and pagination at the bottom of the screen for three pages.
     Clicking on the page numbers should update the questions.
     """
+    @app.route('/questions')
+    def get_questions():
+        page = request.args.get('page', 1, type=int)
+        start = (page - 1) * 10
+        end = start + 10
+
+        results = Question.query.all()
+        questions = [question.format() for question in results]
+
+        return jsonify({
+            'questions': questions[start:end],
+            'totalQuestions': len(questions),
+            'categories': '',
+            'currentCategory': '',
+            'status': 'success'
+        })
 
     """
     @TODO:
@@ -48,6 +73,14 @@ def create_app(test_config=None):
     TEST: When you click the trash icon next to a question, the question will be removed.
     This removal will persist in the database and when you refresh the page.
     """
+    @app.route('/questions/<int:question_id>', methods=["DELETE"])
+    def delete_question(question_id):
+        question = Question.query.get(question_id)
+        question.delete()
+
+        return jsonify({
+            'status': 'success'
+        })
 
     """
     @TODO:
@@ -71,6 +104,35 @@ def create_app(test_config=None):
     Try using the word "title" to start.
     """
 
+    @app.route('/questions', methods=["POST"])
+    def search_questions():
+        data = request.get_json()
+
+        if 'searchTerm' in data.keys():
+            print("searching questions...")
+            results = Question.query.filter(Question.question.like("%"+data['searchTerm']+"%")).all()
+            questions = [question.format() for question in results]
+
+            return jsonify({
+                'questions': questions,
+                'totalQuestions': len(questions),
+                'currentCategory': '',
+                'status': 'success'
+            })
+        else:
+            print("creating new question...")
+            new_question = Question(
+                question=data['question'],
+                answer=data['answer'],
+                difficulty=data['difficulty'],
+                category=data['category']
+                )
+            new_question.insert()
+
+            return jsonify({
+                'status': 'success'
+            })
+
     """
     @TODO:
     Create a GET endpoint to get questions based on category.
@@ -79,6 +141,20 @@ def create_app(test_config=None):
     categories in the left column will cause only questions of that
     category to be shown.
     """
+
+    @app.route('/categories/<int:cat_id>/questions', methods=["GET"])
+    def get_questions_by_cat(cat_id):
+        category = Category.query.filter_by(id=cat_id).all()
+
+        results = Question.query.filter_by(category=cat_id).all()
+        questions = [question.format() for question in results]
+        
+        return jsonify({
+            'questions': questions,
+            'totalQuestions': '',
+            'currentCategory': category[0].type,
+            'status': 'success'
+        })
 
     """
     @TODO:
@@ -91,6 +167,11 @@ def create_app(test_config=None):
     one question at a time is displayed, the user is allowed to answer
     and shown whether they were correct or not.
     """
+    @app.route('/quizzes', methods=["POST"])
+    def get_quizzes():
+        return jsonify({
+            'status': 'success'
+        })
 
     """
     @TODO:
