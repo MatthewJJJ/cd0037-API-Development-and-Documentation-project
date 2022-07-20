@@ -52,7 +52,7 @@ By making notes ahead of time, you will practice the core skill of being able to
 
 `Base URL for now is http://127.0.0.1:5000/`
 
-## Get Categories
+#### Get Categories
 
 `GET '/categories'`
 
@@ -60,7 +60,7 @@ By making notes ahead of time, you will practice the core skill of being able to
 - Request Arguments: None
 - Returns: An object with a key, `categories`, that contains an object of `id: category_string` key: value pairs, and a key of status which will have a value of success (if the request was successful).
 
-# Request Response:
+###### Request Response:
 
 ```json
 {
@@ -76,7 +76,7 @@ By making notes ahead of time, you will practice the core skill of being able to
 }
 ```
 
-## Get Questions
+#### Get Questions
 
 `GET '/questions?page=${integer}'`
 
@@ -84,7 +84,7 @@ By making notes ahead of time, you will practice the core skill of being able to
 - Request Arguments: page -> integer
 - Returns: An object with 10 paginated questions, total questions, object including all categories, current category string, and key of status which will have a value of success (if request was successful)
 
-# Request Response:
+##### Request Response:
 
 ```json
 {
@@ -111,7 +111,7 @@ By making notes ahead of time, you will practice the core skill of being able to
 }
 ```
 
-## Get Set of Questions for Category
+#### Get Set of Questions for Category
 
 `GET '/categories/${id}/questions'`
 
@@ -119,7 +119,7 @@ By making notes ahead of time, you will practice the core skill of being able to
 - Request Arguments: id - integer
 - Returns: An object with questions for the specified category, total questions, current category string, and key of status which will have a value of success (if the request was successful).
 
-# Request Response:
+##### Request Response:
 
 ```json
 {
@@ -138,7 +138,7 @@ By making notes ahead of time, you will practice the core skill of being able to
 }
 ```
 
-## Delete Question
+#### Delete Question
 
 `DELETE '/questions/${id}'`
 
@@ -146,7 +146,7 @@ By making notes ahead of time, you will practice the core skill of being able to
 - Request Arguments: id - integer
 - Returns: the removed question data in the removed_question key and a status key which will be success if the request is successful.
 
-# Request Response:
+##### Request Response:
 
 ```json
 {
@@ -161,13 +161,13 @@ By making notes ahead of time, you will practice the core skill of being able to
 }
 ```
 
-## Run Quiz
+#### Run Quiz
 
 `POST '/quizzes'`
 
 - Sends a post request in order to get the next question
 
-# Request Body:
+##### Request Body:
 
 ```json
 {
@@ -176,7 +176,7 @@ By making notes ahead of time, you will practice the core skill of being able to
 }
 ```
 
-# Request Response:
+##### Request Response:
 
 ```json
 {
@@ -191,13 +191,13 @@ By making notes ahead of time, you will practice the core skill of being able to
 }
 ```
 
-## Add Question
+#### Add Question
 
 `POST '/questions'`
 
 - Sends a post request in order to add a new question
 
-# Request Body:
+##### Request Body:
 
 ```json
 {
@@ -208,7 +208,7 @@ By making notes ahead of time, you will practice the core skill of being able to
 }
 ```
 
-# Response Body:
+###### Response Body:
 
 ```json
 {
@@ -223,13 +223,13 @@ By making notes ahead of time, you will practice the core skill of being able to
 }
 ```
 
-## Search Questions
+#### Search Questions
 
 `POST '/questions'`
 
 - Sends a post request in order to search for a specific question by search term
 
-# Request Body:
+##### Request Body:
 
 ```json
 {
@@ -237,7 +237,7 @@ By making notes ahead of time, you will practice the core skill of being able to
 }
 ```
 
-# Response Body:
+##### Response Body:
 
 ```json
 {
