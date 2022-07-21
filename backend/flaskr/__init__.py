@@ -1,3 +1,4 @@
+from ast import Break
 import os
 from unicodedata import category
 from flask import Flask, request, abort, jsonify
@@ -60,6 +61,9 @@ def create_app(test_config=None):
         results = Question.query.all()
         questions = [question.format() for question in results]
 
+        if len(questions[start:end]) == 0:
+            abort(404)
+
         return jsonify({
             'questions': questions[start:end],
             'totalQuestions': len(questions),
@@ -75,13 +79,16 @@ def create_app(test_config=None):
     """
     @app.route('/questions/<int:question_id>', methods=["DELETE"])
     def delete_question(question_id):
-        question = Question.query.get(question_id)
-        question.delete()
+        try:
+            question = Question.query.get(question_id)
+            question.delete()
 
-        return jsonify({
-            'removed_question': question.format(),
-            'status': 'success'
-        })
+            return jsonify({
+                'removed_question': question.format(),
+                'status': 'success'
+            })
+        except:
+            abort(500)
 
     """
     @TODO:
@@ -113,19 +120,22 @@ def create_app(test_config=None):
                 'status': 'success'
             })
         else:
-            print("creating new question...")
-            new_question = Question(
-                question=data['question'],
-                answer=data['answer'],
-                difficulty=data['difficulty'],
-                category=data['category']
-                )
-            new_question.insert()
+            try:
+                print("creating new question...")
+                new_question = Question(
+                    question=data['question'],
+                    answer=data['answer'],
+                    difficulty=data['difficulty'],
+                    category=data['category']
+                    )
+                new_question.insert()
 
-            return jsonify({
-                'new_question': new_question.format(),
-                'status': 'success'
-            })
+                return jsonify({
+                    'new_question': new_question.format(),
+                    'status': 'success'
+                })
+            except:
+                abort(500)
 
     """
     @TODO:
@@ -138,9 +148,12 @@ def create_app(test_config=None):
     def get_questions_by_cat(cat_id):
         category = Category.query.filter_by(id=cat_id).all()
 
+        if len(category) == 0:
+            abort(404)
+
         results = Question.query.filter_by(category=cat_id).all()
         questions = [question.format() for question in results]
-        
+            
         return jsonify({
             'questions': questions,
             'totalQuestions': len(questions),
@@ -165,6 +178,7 @@ def create_app(test_config=None):
 
         return jsonify({
             'question': questions[rand_index],
+            'quiz_category': category[0].type,
             'status': 'success'
         })
 

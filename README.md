@@ -97,7 +97,7 @@ By making notes ahead of time, you will practice the core skill of being able to
       "category": 2
     }
   ],
-  "totalQuestions": 100,
+  "totalQuestions": 19,
   "categories": {
     "1": "Science",
     "2": "Art",
@@ -132,7 +132,7 @@ By making notes ahead of time, you will practice the core skill of being able to
       "category": 4
     }
   ],
-  "totalQuestions": 100,
+  "totalQuestions": 19,
   "currentCategory": "History",
   "status": "success"
 }
