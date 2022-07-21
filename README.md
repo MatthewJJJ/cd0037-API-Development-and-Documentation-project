@@ -50,13 +50,22 @@ By making notes ahead of time, you will practice the core skill of being able to
 
 ### API Reference
 
+### Starting the API
+
+1. First, intialize the python virtual environment: `python -m virtualenv env`
+2. Second, activate the python virtual environment: `source env/Scripts/activate`
+3. Third, install the project dependencies: `pip install -r requirements.txt`
+4. Finally, run the project: `FLASK_APP=flaskr FLASK_DEBUG=true flask run`
+
 `Base URL for now is http://127.0.0.1:5000/`
+
+Hit http://127.0.0.1:5000/ to see the message `Hello from the Udacity quiz question API!` to confirm the API is running correctly.
 
 #### Get Categories
 
 `GET '/categories'`
 
-- Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
+- Gets and object of categories in which the keys are the ids and the value is the category
 - Request Arguments: None
 - Returns: An object with a key, `categories`, that contains an object of `id: category_string` key: value pairs, and a key of status which will have a value of success (if the request was successful).
 
@@ -80,7 +89,7 @@ By making notes ahead of time, you will practice the core skill of being able to
 
 `GET '/questions?page=${integer}'`
 
-- Fetches a set of questions, a total number of questions, all categories, and current category string.
+- Gets a set of questions on a page, a total number of questions, all categories, and current category string.
 - Request Arguments: page -> integer
 - Returns: An object with 10 paginated questions, total questions, object including all categories, current category string, and key of status which will have a value of success (if request was successful)
 
@@ -91,8 +100,8 @@ By making notes ahead of time, you will practice the core skill of being able to
   "questions": [
     {
       "id": 1,
-      "question": "This is a question",
-      "answer": "This is an answer",
+      "question": "Test Question",
+      "answer": "Test Answer",
       "difficulty": 5,
       "category": 2
     }
@@ -115,7 +124,7 @@ By making notes ahead of time, you will practice the core skill of being able to
 
 `GET '/categories/${id}/questions'`
 
-- Fetches questions for a category specified by id request argument
+- Gets a list of questions corresponding to a category specified by id request argument
 - Request Arguments: id - integer
 - Returns: An object with questions for the specified category, total questions, current category string, and key of status which will have a value of success (if the request was successful).
 
@@ -126,8 +135,8 @@ By making notes ahead of time, you will practice the core skill of being able to
   "questions": [
     {
       "id": 1,
-      "question": "This is a question",
-      "answer": "This is an answer",
+      "question": "Test Question",
+      "answer": "Test Answer",
       "difficulty": 5,
       "category": 4
     }
@@ -142,7 +151,7 @@ By making notes ahead of time, you will practice the core skill of being able to
 
 `DELETE '/questions/${id}'`
 
-- Deletes a specified question using the id of the question
+- Deletes a question using the question's id
 - Request Arguments: id - integer
 - Returns: the removed question data in the removed_question key and a status key which will be success if the request is successful.
 
@@ -182,8 +191,8 @@ By making notes ahead of time, you will practice the core skill of being able to
 {
   "question": {
     "id": 1,
-    "question": "This is a question",
-    "answer": "This is an answer",
+    "question": "Test Question",
+    "answer": "Test Answer",
     "difficulty": 5,
     "category": 4
   },
@@ -201,8 +210,8 @@ By making notes ahead of time, you will practice the core skill of being able to
 
 ```json
 {
-  "question": "some question",
-  "answer": "some answer",
+  "question": "Test Question",
+  "answer": "Test Answer",
   "difficulty": "3",
   "category": 1
 }
@@ -244,13 +253,25 @@ By making notes ahead of time, you will practice the core skill of being able to
   "questions": [
     {
       "id": 1,
-      "question": "This is a question",
-      "answer": "This is an answer",
+      "question": "Test Question",
+      "answer": "Test Answer",
       "difficulty": 5,
       "category": 5
     }
   ],
-  "totalQuestions": 100,
+  "totalQuestions": 19,
   "currentCategory": "Entertainment"
+}
+```
+
+#### Handling Errors
+
+An error will respond with the following format:
+
+```json
+{
+  "error": ###,
+  "message": "description of the error",
+  "status": "error"
 }
 ```
