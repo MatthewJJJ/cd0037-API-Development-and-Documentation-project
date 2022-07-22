@@ -26,6 +26,7 @@ def create_app(test_config=None):
     def get_greeting():
         return "Hello from the Udacity quiz question API!"
 
+    # following route retrieves all of the categories needed for the game
     @app.route('/categories')
     def get_categories():
         results = Category.query.all()
@@ -39,14 +40,16 @@ def create_app(test_config=None):
             'status': 'success'
         })
 
+    # following route retrieves all of the questions for all categories in the database
     @app.route('/questions')
     def get_questions():
-        cat_results = Category.query.all()
+        category_results = Category.query.all()
         response_dict = {}
-        for element in cat_results:
+        for element in category_results:
             new_element = { element.id: element.type }
             response_dict.update(new_element)
 
+        # following code calculates the start and end of the page so pagnination is possible
         page = request.args.get('page', 1, type=int)
         start = (page - 1) * 10
         end = start + 10
@@ -65,6 +68,7 @@ def create_app(test_config=None):
             'status': 'success'
         })
 
+    # following route deletes one specific question
     @app.route('/questions/<int:question_id>', methods=["DELETE"])
     def delete_question(question_id):
         try:
@@ -78,6 +82,7 @@ def create_app(test_config=None):
         except:
             abort(500)
 
+    # following route either creates a question or searches the questions depending on what it is passed
     @app.route('/questions', methods=["POST"])
     def search_questions():
         data = request.get_json()
@@ -93,7 +98,7 @@ def create_app(test_config=None):
                 'currentCategory': '',
                 'status': 'success'
             })
-        else:
+        elif 'question' in data.keys():
             try:
                 print("creating new question...")
                 new_question = Question(
@@ -110,15 +115,18 @@ def create_app(test_config=None):
                 })
             except:
                 abort(500)
+        else:
+            abort(400)
 
-    @app.route('/categories/<int:cat_id>/questions', methods=["GET"])
-    def get_questions_by_cat(cat_id):
-        category = Category.query.filter_by(id=cat_id).all()
+    # following route retrieves all of the questions for a given category
+    @app.route('/categories/<int:category_id>/questions', methods=["GET"])
+    def get_questions_by_cat(category_id):
+        category = Category.query.filter_by(id=category_id).all()
 
         if len(category) == 0:
             abort(404)
 
-        results = Question.query.filter_by(category=cat_id).all()
+        results = Question.query.filter_by(category=category_id).all()
         questions = [question.format() for question in results]
             
         return jsonify({
@@ -128,20 +136,33 @@ def create_app(test_config=None):
             'status': 'success'
         })
 
+    # following route runs a quiz given past questions so it knows what set to select from next
     @app.route('/quizzes', methods=["POST"])
     def get_quizzes():
         data = request.get_json()
+        category = {}
+        results = []
 
-        category = Category.query.filter_by(type=data['quiz_category']).all()
-        results = Question.query.filter_by(category=category[0].id).filter(Question.id.notin_(data['previous_questions'])).all()
+        if data['quiz_category'] == 'click':
+            results = Question.query.filter(Question.id.notin_(data['previous_questions'])).all()
+            category = 'all'
+        else:
+            category = Category.query.filter_by(type=data['quiz_category']).all()
+            if len(category) == 0:
+                abort(422)
+            results = Question.query.filter_by(category=category[0].id).filter(Question.id.notin_(data['previous_questions'])).all()
+            category = category[0].type
 
         questions = [question.format() for question in results]
 
-        rand_index = random.randint(0, len(questions) -1)
+        if len(questions) == 0:
+            return jsonify({'status':'success', 'quiz_category': category})
+
+        rand_index = random.randint(0, len(questions) - 1)
 
         return jsonify({
             'question': questions[rand_index],
-            'quiz_category': category[0].type,
+            'quiz_category': category,
             'status': 'success'
         })
 
@@ -150,9 +171,8 @@ def create_app(test_config=None):
         return jsonify({
             'status': 'error',
             'error': 400,
-            'message': 'recieved bad request... request not processed...',
-            'full_error_message': error
-        }), 404
+            'message': 'recieved bad request... request not processed...'
+        }), 400
 
     @app.errorhandler(404)
     def not_found(error):
@@ -167,18 +187,21 @@ def create_app(test_config=None):
         return jsonify({
             'status': 'error',
             'error': 422,
-            'message': 'unprocessable entity detected... entity not processed',
-            'full_error_message': error
-        }), 404
+            'message': 'unprocessable entity detected... entity not processed'
+        }), 422
 
     @app.errorhandler(500)
-    def bad_request(error):
+    def server_error(error):
         return jsonify({
             'status': 'error',
             'error': 500,
-            'message': 'internal server error... request not processed',
-            'full_error_message': error
-        }), 404
+            'message': 'internal server error... request not processed'
+        }), 500
+
+    app.register_error_handler(400, bad_request)
+    app.register_error_handler(404, not_found)
+    app.register_error_handler(422, not_processed)
+    app.register_error_handler(500, server_error)
 
     return app
 

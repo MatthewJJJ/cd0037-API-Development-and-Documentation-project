@@ -57,6 +57,8 @@ By making notes ahead of time, you will practice the core skill of being able to
 3. Third, install the project dependencies: `pip install -r requirements.txt`
 4. Finally, run the project: `FLASK_APP=flaskr FLASK_DEBUG=true flask run`
 
+**Note: You can override any of the DB settings by specifying a DB_HOST, DB_USER, DB_PASSWORD, or DB_NAME in the run command.**
+
 `Base URL for now is http://127.0.0.1:5000/`
 
 Hit http://127.0.0.1:5000/ to see the message `Hello from the Udacity quiz question API!` to confirm the API is running correctly.
